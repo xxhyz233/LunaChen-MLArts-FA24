@@ -14,6 +14,7 @@ function setup() {
   video.size(640, 480);
   video.hide();
   bodyPose.detectStart(video, gotPoses);
+  
 }
 
 function gotPoses(results) {
@@ -21,10 +22,11 @@ function gotPoses(results) {
 }
 
 function draw() {
+  console.log(poses);
   image(video, 0, 0, width, height);
   pose = poses[0];
   fill(255, 0, 0);
-  // MUST CHECK FOR UNDEFINED FOR ARRAY
+  // MUST CHECK FOR UNDEFINED IN ARRAY
   if (poses.length > 0) {
     noseObj = pose.nose;
     circle(noseObj.x, noseObj.y, 100);
