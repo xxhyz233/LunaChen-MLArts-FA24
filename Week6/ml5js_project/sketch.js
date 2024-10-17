@@ -5,6 +5,7 @@ let stepSize = 5.0;
 let moduleSize = 25;
 let lineModule;
 let elements;
+// let cursorLayer;
 
 // ml5 variables
 let video;
@@ -17,8 +18,13 @@ let thumbTipX = 0;
 let thumbTipY = 0;
 let handPinch = false;
 
+let classifier;
+let handLabel = "";
+let imageModelURL = 'https://teachablemachine.withgoogle.com/models/206aX-2ft/';
+
 function preload() {
   handPose = ml5.handPose();
+  classifier = ml5.imageClassifier(imageModelURL + 'model.json');
   // Preload each svg into our elements array
   elements = [];
   elements[0] = loadImage('media/01.svg');
@@ -45,6 +51,7 @@ function setup() {
   x = fingerTipX;
   y = fingerTipY;
   lineModule = elements[0];
+  // cursorLayer = createGraphics(640, 640);
   strokeWeight(10);
   stroke(255);
 }
@@ -53,7 +60,32 @@ function gotResults(results) {
   hands = results;
 }
 
+function classifyVideo() {
+  classifier.classify(video, gotTrainingResult);
+}
+
+function gotTrainingResult(results) {
+  handLabel = results[0].label;
+  console.log(handLabel);
+  if (handLabel == "Higher") {
+    
+  }
+  else {
+    brushChange(handLabel);
+  }
+}
+
 function draw() {
+  fill(0)
+  // cursorLayer.erase();
+  // cursorLayer.circle(fingerTipX, fingerTipY, 20);
+  // cursorLayer.noErase();
+  // image(cursorLayer, 0, 0);
+  if(frameCount % 10 == 0) {
+    classifyVideo();
+  }
+  
+  
   image(video, 0, height/2, width, height/2);
   if (hands.length >= 1) {
     hand = hands[0];
@@ -81,6 +113,7 @@ function draw() {
     if (d > stepSize) {
       let angle = atan2(fingerTipY - y, fingerTipX - x);
       push();
+      fill(0);
       translate(fingerTipX, fingerTipY);
       rotate(angle + PI);
       image(lineModule, 0, 0, d, moduleSize);
@@ -98,24 +131,13 @@ function isPinched () {
   return distance < 30;
 }
 
-function keyReleased() {
-  // Print screen on s key
-  if (key == 's' || key == 'S') {
-    saveCanvas(gd.timeStamp(), 'png');
-  }
-  if (keyCode == DELETE || keyCode == BACKSPACE) {
-    background(255);
-  }
-  // Change brush type, use swipe action for detection
-  if (key == '1') lineModule = elements[0];
-  if (key == '2') lineModule = elements[1];
-  if (key == '3') lineModule = elements[2];
-  if (key == '4') lineModule = elements[3];
-  if (key == '5') lineModule = elements[4];
-  if (key == '6') lineModule = elements[5];
-  if (key == '7') lineModule = elements[6];
-  if (key == '8') lineModule = elements[7];
-  if (key == '9') lineModule = elements[8];
+function brushChange(gesture) {
+  console.log(gesture);
+  // Change brush type, use finger number for detection
+  if (gesture == '1') lineModule = elements[0];
+  if (gesture == '2') lineModule = elements[1];
+  if (gesture == '3') lineModule = elements[2];
+  if (gesture == '4') lineModule = elements[3];
 }
 
 function keyPressed() {
