@@ -1,1 +1,1 @@
-Intro to Machine Learning for the Arts, Fall 2024
+# Intro to Machine Learning for the Arts, Fall 2024
